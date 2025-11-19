@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  nayhe: ##dominio
+    image: 
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.nayhe.entrypoints=http"
+        - "traefik.http.routers.nayhe.rule=Host(`nayhe.byronrm.com`)"
+        - "traefik.http.middlewares.nayhe-https-redirect.redirectscheme.scheme=https"
+        - "traefik.http.routers.nayhe.middlewares=nayhe-https-redirect"
+        - "traefik.http.routers.nayhe-secure.entrypoints=https"
+        - "traefik.http.routers.nayhe-secure.rule=Host(`nayhe.byronrm.com`)"
+        - "traefik.http.routers.nayhe-secure.tls=true"
+        - "traefik.http.routers.nayhe-secure.tls.certresolver=http"
+        - "traefik.http.routers.nayhe-secure.service=nayhe"
+        - "traefik.http.services.nayhe.loadbalancer.server.port=5000"
+        - "traefik.docker.network=traefik-public"
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true
