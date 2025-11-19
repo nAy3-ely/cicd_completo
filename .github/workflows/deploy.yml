@@ -49,16 +49,11 @@ jobs:
         push: true
         tags: ghcr.io/nay3-ely/cicd_completo:latest
 
-    - name: 🧾 Mostrar variables básicas (solo locales, no secretos)
-      run: |
-        echo "Probando conexión SSH con:"
-        echo "Host: ${{ secrets.VPS_HOST }}"
-        echo "Usuario: ${{ secrets.VPS_USER }}"
-        echo "Puerto: ${{ secrets.VPS_SSH_PORT }}"
-        echo "Password: ${{ secrets.VPS_PASSWORD }}"
+    # --- Se mantiene el acceso a 'secrets' para la conexión ---
     - name: 🧪 Probar conexión SSH
       uses: appleboy/ssh-action@v1
       with:
+        # Estas variables deben ser SECRETOS en tu repositorio
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USER }}
         password: ${{ secrets.VPS_PASSWORD }}
