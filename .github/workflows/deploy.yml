@@ -81,14 +81,23 @@ jobs:
         port: ${{ secrets.VPS_SSH_PORT }}
         script: |
           #echo "desplegando servicios"
+          #cd /home/1753748969/despliegue
+          cd ~/despliegue                     #significa el pat base 
         
-          #echo "borrar el stack siempre"
-          #docker stack rm cristhian || true 
-
+          #paso 1 descarga img
           #echo "descargando la imagen del GHCR"
           echo "${{ secrets.GHCR_PAT}}" | docker login gicr.io -u nay3-ely --password-stdir
           docker pull ghcr.io/nay3-ely/cicd_completo:1.0.0
 
-          #echo "despliegue stack"
-          #docker stack deploy -c stack.yml --with-registry-auth cristhian
+          #paso 2 borrrar el stack
+          #docker stack rm cristhian || true 
+
+          sleep 30
+
+          #paso 3 desplegar 
+
+          echo "despliegue stack"
+          docker stack deploy -c stack.yml --with-registry-auth cristhian
+
+          docker ps
 
