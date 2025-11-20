@@ -4,59 +4,52 @@ on:
   push:
     branches:
       - main
-  pull_request:
-
-permissions: 
-  contents: read
-  packages: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
-    - name: 🧾 Checkout repository
-      uses: actions/checkout@v4
+    permissions:
+      contents: read
+      packages: write
 
-    - name: 🐍 Set up Python
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: '3.10'
 
-    - name: 📦 Install dependencies
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install -r requirements.txt
 
-    - name: 🧪 Run tests (si no tienes tests, no fallará)
-      run: |
-        if [ -d tests ]; then pytest; else echo "No tests folder, skipping"; fi
 
-    - name: 🧹 Run lint (opcional, no rompe el pipeline si no existe)
-      run: |
-        if command -v flake8 >/dev/null 2>&1; then flake8 .; else echo "flake8 no instalado"; fi
-
-    - name: 🔐 Login to GitHub Container Registry
+    - name: Login to GitHub Container Registry
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: 🏗️ Build and push Docker image
+    - name: Build and push Docker image
       uses: docker/build-push-action@v6
       with:
         push: true
-        tags: ghcr.io/nay3-ely/cicd_completo:latest
+        tags: ghcr.io/dano-19/repaso:1.0.0
 
-    - name: 🧾 Mostrar variables básicas (solo locales, no secretos)
+    - name: mostrar variables basicas
       run: |
-        echo "Probando conexión SSH con:"
+        echo "Probando conexion SSH con:"
         echo "Host: ${{ secrets.VPS_HOST }}"
         echo "Usuario: ${{ secrets.VPS_USER }}"
-        echo "Puerto: ${{ secrets.VPS_SSH_PORT }}"
         echo "Password: ${{ secrets.VPS_PASSWORD }}"
-    - name: 🧪 Probar conexión SSH
+        echo "Puerto: ${{ secrets.VPS_SSH_PORT }}"
+
+    - name: probar conexion SSH
       uses: appleboy/ssh-action@v1
       with:
         host: ${{ secrets.VPS_HOST }}
@@ -64,7 +57,38 @@ jobs:
         password: ${{ secrets.VPS_PASSWORD }}
         port: ${{ secrets.VPS_SSH_PORT }}
         script: |
-          echo "✅ Conexión exitosa desde GitHub Actions"
+          echo "Conexion exitosa Github Actions"
           hostname
           whoami
           uptime
+
+    - name: pasar el stack.yml al sevidos
+      uses: appleboy/scp-action@v1
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        port: ${{ secrets.VPS_SSH_PORT }}
+        source: "stack.yml"
+        target: "/home/${{ secrets.VPS_USER }}/despliegue"
+
+    - name: despliegue de los servicios
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        port: ${{ secrets.VPS_SSH_PORT }}
+        script: |
+          #echo "desplegando servicios"
+        
+          #echo "borrar el stack siempre"
+          #docker stack rm cristhian || true 
+
+          #echo "descargando la imagen del GHCR"
+          echo "${{ secrets.GHCR_PAT}}" | docker login gicr.io -u nay3-ely --password-stdir
+          docker pull ghcr.io/dano-19/repaso:1.0.0
+
+          #echo "despliegue stack"
+          #docker stack deploy -c stack.yml --with-registry-auth cristhian
+
