@@ -39,7 +39,7 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         push: true
-        tags: ghcr.io/dano-19/repaso:1.0.0
+        tags: ghcr.io/nay3-ely/cicd_completo:1.0.0
 
     - name: mostrar variables basicas
       run: |
@@ -87,7 +87,7 @@ jobs:
 
           #echo "descargando la imagen del GHCR"
           echo "${{ secrets.GHCR_PAT}}" | docker login gicr.io -u nay3-ely --password-stdir
-          docker pull ghcr.io/dano-19/repaso:1.0.0
+          docker pull ghcr.io/nay3-ely/cicd_completo:1.0.0
 
           #echo "despliegue stack"
           #docker stack deploy -c stack.yml --with-registry-auth cristhian
