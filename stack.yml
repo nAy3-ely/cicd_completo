@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   nayhe: 
-    image: ghcr.io/nay3-ely/cicd_completo:latest
+    image: ghcr.io/nay3-ely/cicd_completo::1.0.0
     deploy:
       replicas: 1
       labels:
