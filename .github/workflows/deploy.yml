@@ -39,7 +39,7 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         push: true
-        tags: ghcr.io/nay3-ely/cicd_completo:1.0.0
+        tags: ghcr.io/nay3-ely/cicdcompleto:1.0.0
 
     - name: mostrar variables basicas
       run: |
@@ -87,17 +87,17 @@ jobs:
           #paso 1 descarga img
           #echo "descargando la imagen del GHCR"
           echo "${{ secrets.GHCR_PAT}}" | docker login gicr.io -u nay3-ely --password-stdir
-          docker pull ghcr.io/nay3-ely/cicd_completo:1.0.0
+          docker pull ghcr.io/nay3-ely/cicdcompleto:1.0.0
 
           #paso 2 borrrar el stack
-          #docker stack rm cristhian || true 
+          #docker stack rm nayha || true 
 
           sleep 30
 
           #paso 3 desplegar 
 
           echo "despliegue stack"
-          docker stack deploy -c stack.yml --with-registry-auth cristhian
+          docker stack deploy -c stack.yml --with-registry-auth nayha
 
           docker ps
 
